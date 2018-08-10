@@ -40,7 +40,7 @@ class BooksController extends Controller
     ->addColumn(['data' => 'title', 'name'=>'title', 'title'=>'Judul'])
     ->addColumn(['data' => 'amount', 'name'=>'amount', 'title'=>'Jumlah'])
     ->addColumn(['data' => 'author.name', 'name'=>'author.name', 'title'=>'Penulis'])
-   ->addColumn(['data' => 'action', 'name'=>'action', 'title'=>'', 'orderable'=>false, 'searchable'=>false]);
+    ->addColumn(['data' => 'action', 'name'=>'action', 'title'=>'', 'orderable'=>false, 'searchable'=>false]);
 
     return view('books.index')->with(compact('html'));
 }
@@ -65,6 +65,22 @@ class BooksController extends Controller
     ]);
     }   
     return redirect('/');
+}
+    public function returnBack($book_id)
+{
+    $borrowLog = BorrowLog::where('user_id', Auth::user()->id)
+    ->where('book_id', $book_id)
+    ->where('is_returned', 0)
+    ->first();
+    if ($borrowLog) {
+    $borrowLog->is_returned = true;
+    $borrowLog->save();
+    Session::flash("flash_notification", [
+    "level" => "success",
+    "message" => "Berhasil mengembalikan " . $borrowLog->book->title
+    ]);
+}
+    return redirect('/home');
 }
 
 
@@ -154,7 +170,7 @@ class BooksController extends Controller
     {
         
         $book = Book::find($id);
-        $book->update($request->all());
+        if(!$book->update($request->all())) return redirect()->back();
 
         if ($request->hasFile('cover')) {
         // menambil cover yang diupload berikut ekstensinya
@@ -201,8 +217,11 @@ class BooksController extends Controller
     public function destroy($id)
     {
         $book = Book::find($id);
+        $cover = $book->cover;
+if(!$book->delete()) return redirect()->back();
+        
 // hapus cover lama, jika ada
-if ($book->cover) {
+if ($cover) {
 $old_cover = $book->cover;
 $filepath = public_path() . DIRECTORY_SEPARATOR . 'img'
 . DIRECTORY_SEPARATOR . $book->cover;
@@ -212,11 +231,11 @@ File::delete($filepath);
 // File sudah dihapus/tidak ada
 }
 }
-$book->delete();
+
 Session::flash("flash_notification", [
 "level"=>"success",
 "message"=>"Buku berhasil dihapus"
 ]);
-return redirect()->route('books.index');
+return redirect()->route('admin.books.index');
     }
 }

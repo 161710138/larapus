@@ -96,6 +96,7 @@
     <script src="{{ asset('js/dataTables.bootstrap.min.js') }}"></script>
     <script src="{{ asset('js/selectize.min.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="{{ asset('https://www.google.com/recaptcha/api.js') }}"></script>
     
 
     @yield('scripts')

@@ -31,10 +31,18 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    protected $casts = [
+    'is_verified' => 'boolean',
+    ];
     
 
     public function borrow(Book $book)
 {
+    // cek apakah masih ada stok buku
+    if ($book->stock < 1) {
+    throw new BookException("Buku $book->title sedang tidak tersedia.");
+}
     // cek apakah buku ini sedang dipinjam oleh user
     if($this->borrowLogs()->where('book_id',$book->id)->where('is_returned', 0)->count() > 0 ) {
     throw new BookException("Buku $book->title sedang Anda pinjam.");

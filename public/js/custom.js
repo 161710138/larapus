@@ -13,4 +13,3 @@ return c;
 $('.js-selectize').selectize({
 sortField: 'text'
 });
-});
