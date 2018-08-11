@@ -46,11 +46,15 @@
 
                     <!-- Left Side Of Navbar -->
                 <ul class="nav navbar-nav">
+                @role('admin')
                 @if (Auth::check())
                 <li><a href="{{ url('/home') }}">Home</a></li>
                 <li><a href="{{ route('authors.index') }}">Penulis</a></li>
                 <li><a href="{{ route('books.index') }}">Buku</a></li>
-
+                <li><a href="{{ route('members.index') }}">Member</a></li> 
+                @endrole
+                @if (auth()->check())
+                <li><a href="{{ url('/settings/profile') }}">Profil</a></li> @endif
                 @endif
                 </ul>
 
@@ -66,7 +70,10 @@
                                     {{ Auth::user()->name }} <span class="caret"></span>
                                 </a>
 
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu" role="menu">
+                                <li><a href="{{ url('/settings/password') }}"><i class="fa fa-btn fa-lock"></i> Ubah Password</a>
+                                </li>
+
                                     <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
