@@ -182,6 +182,8 @@ return [
         Yajra\Datatables\DatatablesServiceProvider::class,
         Yajra\DataTables\HtmlServiceProvider::class,
         Anhskohbo\NoCaptcha\NoCaptchaServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -236,5 +238,8 @@ return [
         'Html' => Collective\Html\FormFacade::class,
         'Laratrust' => Laratrust\LaratrustFacade::class,
         'Datatables' => Yajra\Datatables\Facades\Datatables::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+
         ],
 ];

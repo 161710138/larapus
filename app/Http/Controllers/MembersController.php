@@ -10,6 +10,8 @@ use Yajra\DataTables\Facades\Datatables;
 use App\Http\Requests\StoreMemberRequest; 
 use Illuminate\Support\Facades\Session; 
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\UpdateMemberRequest;
+
 
 class MembersController extends Controller
 {
@@ -25,6 +27,8 @@ class MembersController extends Controller
     {
         $members = Role::where('name', 'member')->first()->users; 
         return Datatables::of($members)
+        ->addColumn('name', function($member) { return '<a href="'.route('members.show', $member->id).'">'.$member->name.'</a>';
+})
         ->addColumn('action', function($member){ return view('datatable._action', [
             'model' => $member,
             'form_url'  => route('members.destroy', $member->id),
@@ -68,9 +72,6 @@ class MembersController extends Controller
         $data['is_verified'] = 1;
         $member = User::create($data);
 
-        $data['is_verified'] = 1;
-        $member = User::create($data);
-
         // set role
         $memberRole = Role::where('name', 'member')->first();
         $member->attachRole($memberRole);
@@ -98,7 +99,8 @@ class MembersController extends Controller
      */
     public function show($id)
     {
-        //
+        $member = User::find($id);
+        return view('members.show', compact('member'));
     }
 
     /**
@@ -109,7 +111,8 @@ class MembersController extends Controller
      */
     public function edit($id)
     {
-        //
+        $member = Member::find($id);
+        return view('members.edit')->with(compact('member'));
     }
 
     /**
@@ -119,10 +122,18 @@ class MembersController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateMemberRequest $request, $id)
     {
-        //
-    }
+
+        $member = User::find($id);
+        $member->update($request->only('name','email'));
+        Session::flash("flash_notification", [
+        "level"=>"success",
+        "message"=>"Berhasil menyimpan $member->name"
+    ]);
+        return redirect()->route('members.index');
+
+        }
 
     /**
      * Remove the specified resource from storage.
@@ -132,6 +143,15 @@ class MembersController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $member = User::find($id);
+        if ($member->hasRole('member')) {
+        $member->delete();
+        Session::flash("flash_notification", [
+        "level"=>"success",
+        "message"=>"Member berhasil dihapus"
+]);
+
     }
+    return redirect()->route('members.index');
+}
 }
